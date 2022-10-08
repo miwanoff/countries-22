@@ -1,4 +1,16 @@
-<?php
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Countries</h1>
+    <?php
 $countries = [
     [
         "name" => "France",
@@ -79,7 +91,7 @@ function cmp2($a, $b)
 function try_walk($country, $key_country, $data)
 {
     static $i = 1; // Статична глобальна змінна-лічильник
-    echo $data . $i . " ";
+    echo "<strong>".$data . $i . "</strong>";
     foreach ($country as $key => $value) {
         if (!is_array($value)) {
             echo "$key:$value\t";
@@ -88,14 +100,35 @@ function try_walk($country, $key_country, $data)
             foreach ($value as $k => $v) {
                 echo "[{$k} рік. - $v] ";
             }
-
         }
     }
-    echo "\n";
+    echo "<br>\n";
     $i++;
 }
 
-echo "№ Назва\tСтолиця\tПлоща\tНаселення\n";
+function search($countries, $data) {
+    $result = [];
+    foreach ($countries as $country_number => $country) {
+        foreach ($country as $key => $value) {
+            if (!is_array($value)) {
+                if (stristr($value, $data)) {
+                    $result[] = $country_number;
+                }
+            } else {
+                foreach ($value as $k => $v) {
+                    if (stristr($v, $data) || strstr($k, $data)) {
+                        $result[] = $country_number;
+                    }
+                }
+            }
+        }
+    }
+    return array_unique($result);
+    //print_r($result);
+}
+
+
+echo "<h3>№ Назва\tСтолиця\tПлоща\tНаселення</h3>\n";
 array_walk($countries, "try_walk", "№");
 
 uasort($countries, "cmp_capital");
@@ -113,3 +146,17 @@ uasort($countries, "cmp2");
 
 echo "№ Назва\tСтолиця\tПлоща\tНаселення\n";
 array_walk($countries, "try_walk", "№");
+
+//search($countries, "land");
+$seach_result = array_flip(search($countries, "land"));
+//print_r($seach_result);
+$countries_seach_result = array_intersect_key($countries, $seach_result);
+//print_r($countries_seach_result);
+echo "\nseach result \"land\"\n";
+
+array_walk($countries_seach_result, "try_walk", "№");
+?>
+    <?= "рядок_для_виведення"."{$countries[0]['name']} : {$countries[0]['population']['2010']}\n" ?>
+</body>
+
+</html>
